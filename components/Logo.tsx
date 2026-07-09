@@ -12,13 +12,6 @@ export const Logo: React.FC<LogoProps> = ({ className = "h-10 w-auto", showText 
         src="/logo.png" 
         alt="Helping Hand Strio Logo" 
         className={className}
-        onError={(e) => {
-          // Fallback if logo.png extension is uppercase (.PNG)
-          const target = e.currentTarget;
-          if (!target.src.endsWith('.PNG')) {
-            target.src = '/logo.PNG';
-          }
-        }}
       />
       {showText && (
         <span className="font-bold text-lg text-white">
