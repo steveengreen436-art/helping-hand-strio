@@ -10,7 +10,7 @@ export default function HomePage() {
           alt="Helping Hand Strio Zulu Logo"
           width={180}
           height={180}
-          className="rounded-full border-2 border-neonCyan shadow-[0_0_30px_rgba(102,252,241,0.2)]"
+         className="rounded-full overflow-hidden object-cover border-2 border-neonCyan shadow-[0_0_30px_rgba(102,252,241,0.2)]"
         />
       </div>
 
