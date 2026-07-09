@@ -7,6 +7,9 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Helping Hand Strio - Employment Directory",
   description: "Connecting talent directly with employment opportunities.",
+verification: {
+    google: "6_vvhYaOKz-DqnCCgYInWfCuNJWG-hp03Fhi8mJt1d4",
+  },
 };
 
 export default function RootLayout({
