@@ -1,6 +1,13 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://your-supabase-url.supabase.co";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "your-anon-key";
+const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+const rawKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
+
+// Ensure a valid URL format exists during Next.js build time
+const supabaseUrl = (rawUrl && rawUrl.startsWith('http')) 
+  ? rawUrl 
+  : 'https://placeholder.supabase.co';
+
+const supabaseAnonKey = rawKey || 'placeholder-key';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
