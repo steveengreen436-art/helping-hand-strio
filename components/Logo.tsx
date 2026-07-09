@@ -1,24 +1,32 @@
-import Image from "next/image";
+import React from 'react';
 
-export default function Logo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
-  const dimensions = {
-    sm: 32,
-    md: 48,
-    lg: 64,
-  };
+interface LogoProps {
+  className?: string;
+  showText?: boolean;
+}
 
+export const Logo: React.FC<LogoProps> = ({ className = "h-10 w-auto", showText = true }) => {
   return (
-    <div className="flex items-center gap-2">
-      <Image
-        src="/logo.png"
-        alt="Helping Hand Strio Logo"
-        width={dimensions[size]}
-        height={dimensions[size]}
-        className="rounded-full overflow-hidden object-cover border border-neonCyan"
+    <div className="flex items-center gap-3">
+      <img 
+        src="/logo.png" 
+        alt="Helping Hand Strio Logo" 
+        className={className}
+        onError={(e) => {
+          // Fallback if logo.png extension is uppercase (.PNG)
+          const target = e.currentTarget;
+          if (!target.src.endsWith('.PNG')) {
+            target.src = '/logo.PNG';
+          }
+        }}
       />
-      <span className="font-bold text-platinum text-lg tracking-wide">
-        Helping Hand <span className="text-neonCyan">Strio</span>
-      </span>
+      {showText && (
+        <span className="font-bold text-lg text-white">
+          Helping Hand <span className="text-cyan-400">Strio</span>
+        </span>
+      )}
     </div>
   );
-}
+};
+
+export default Logo;
