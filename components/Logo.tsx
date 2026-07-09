@@ -14,7 +14,7 @@ export default function Logo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
         alt="Helping Hand Strio Logo"
         width={dimensions[size]}
         height={dimensions[size]}
-        className="rounded-full border border-neonCyan"
+        className="rounded-full overflow-hidden object-cover border border-neonCyan"
       />
       <span className="font-bold text-platinum text-lg tracking-wide">
         Helping Hand <span className="text-neonCyan">Strio</span>
