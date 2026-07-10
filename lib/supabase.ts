@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-// We use placeholders here specifically to satisfy the build process
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://example.supabase.co";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "example-key";
+// Get the variables, but use empty strings as fallbacks
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
 
+// Only create the client if we have valid-looking variables
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
