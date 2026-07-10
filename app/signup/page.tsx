@@ -9,7 +9,6 @@ export default function SignUpPage() {
   const [submitted, setSubmitted] = useState(false);
   const [origin, setOrigin] = useState("");
 
-  // Fix: Set the origin only after the component mounts in the browser
   useEffect(() => {
     setOrigin(window.location.origin);
   }, []);
