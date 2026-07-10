@@ -12,7 +12,7 @@ export const Logo: React.FC<LogoProps> = ({ className = "h-10 w-auto", showText 
       <img 
         src="/logo.png" 
         alt="Helping Hand Strio Logo" 
-        className={className}
+        className={`${className} object-contain`}
       />
       {showText && (
         <span className="font-bold text-lg text-white">
