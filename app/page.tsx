@@ -4,15 +4,16 @@ import Image from "next/image";
 export default function HomePage() {
   return (
     <div className="min-h-[85vh] flex flex-col items-center justify-center text-center px-4 py-12">
-      <div className="mb-6 hover:scale-105 transition duration-300 rounded-full overflow-hidden border-2 border-neonCyan shadow-[0_0_30px_rgba(102,252,241,0.2)] w-[180px] h-[180px]">
-  <Image
-    src="/logo.png"
-    alt="Helping Hand Strio Zulu Logo"
-    width={180}
-    height={180}
-    className="rounded-full object-cover w-full h-full"
-  />
-</div>
+      <div className="mb-6 hover:scale-105 transition duration-300 rounded-full overflow-hidden border-2 border-neonCyan shadow-[0_0_30px_rgba(102,252,241,0.2)] w-[180px] h-[180px] flex items-center justify-center bg-obsidian">
+        <Image
+          src="/logo bb (1).png"
+          alt="Helping Hand Strio Zulu Logo"
+          width={180}
+          height={180}
+          className="rounded-full object-cover w-full h-full"
+          priority
+        />
+      </div>
 
       <h1 className="text-4xl md:text-6xl font-extrabold text-platinum mb-4">
         Connecting Talent with Opportunity <br />
