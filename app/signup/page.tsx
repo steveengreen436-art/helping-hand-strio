@@ -1,5 +1,7 @@
 "use client";
 
+// This forces the page to render ONLY in the browser, 
+// preventing Vercel from trying to build it during deployment.
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from "react";
@@ -17,7 +19,6 @@ export default function SignUpPage() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
     setLoading(true);
 
     const { error } = await supabase.auth.signInWithOtp({
@@ -47,7 +48,7 @@ export default function SignUpPage() {
           <h1 className="text-2xl font-bold text-platinum">Sign Up</h1>
           <input 
             type="email" 
-            placeholder="Enter your email" 
+            placeholder="Enter your email to get started" 
             required 
             className="w-full p-3 rounded-lg bg-obsidian text-platinum border border-white/10" 
             onChange={(e) => setEmail(e.target.value)} 
