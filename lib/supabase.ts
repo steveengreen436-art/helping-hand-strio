@@ -1,8 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Use a placeholder if process.env is undefined during build, 
-// but ensure it's a valid URL format to satisfy the validator.
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
+// Fallback to empty strings to prevent the build from crashing
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
