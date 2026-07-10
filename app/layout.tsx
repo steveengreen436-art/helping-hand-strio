@@ -23,7 +23,7 @@ export default function RootLayout({
         <header className="border-b border-white/10 bg-obsidian/80 backdrop-blur-md sticky top-0 z-40">
           <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
             <Link href="/" className="hover:opacity-90 transition">
-              <Logo size="sm" />
+              <Logo className="h-8 w-auto" />
             </Link>
             <nav className="flex items-center gap-6 text-sm font-semibold">
               <Link href="/explore" className="text-platinum/80 hover:text-neonCyan transition">
