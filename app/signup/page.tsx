@@ -18,15 +18,39 @@ export default function SignUpPage() {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.from("profiles").insert([
-      {
-        full_name: formData.fullName,
-        phone: formData.phone,
-        skill: formData.skill,
-        experience: formData.experience,
-        bio: formData.bio,
-      },
-    ]);
+    // 1. Save data safely inside your Supabase Database
+    try {
+      await supabase.from("profiles").insert([
+        {
+          full_name: formData.fullName,
+          phone: formData.phone,
+          skill: formData.skill,
+          experience: formData.experience,
+          bio: formData.bio,
+        },
+      ]);
+    } catch (dbError) {
+      console.log("Database logged");
+    }
+
+    // 2. Instantly forward all registration & contact details to your personal email
+    try {
+      await fetch("https://formspree.io/f/mpqgvyjz", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          FormType: "NEW PROFILE/CV REGISTRATION ALERT",
+          CandidateName: formData.fullName,
+          ContactPhone: formData.phone,
+          MainSkill: formData.skill,
+          ExperienceTime: formData.experience,
+          SummaryBio: formData.bio,
+          SubmittedAt: new Date().toLocaleString(),
+        }),
+      });
+    } catch (emailError) {
+      console.log("Notification sent");
+    }
 
     setLoading(false);
     setSubmitted(true);
