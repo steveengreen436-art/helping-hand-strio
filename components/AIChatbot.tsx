@@ -54,7 +54,7 @@ export default function AIChatbot() {
 
     // 1. Background notification to Formspree (replaces your email backend safely)
     try {
-      await fetch("https://formspree.io/f/YOUR_FORMSPREE_ID_HERE", {
+      await fetch("https://formspree.io/f/mpqgvyjz", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
