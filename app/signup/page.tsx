@@ -22,13 +22,14 @@ export default function SignUpPage() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.from("profiles").insert([{
-        full_name: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
-        skill: formData.skill,
-        experience: formData.experience,
-        bio: formData.bio,
+  const { error } = await supabase.from("profiles").insert([{
+  full_name: formData.fullName, // Match this to your DB column name
+  email: formData.email,
+  phone: formData.phone,
+  skill: formData.skill,
+  experience: formData.experience,
+  bio: formData.bio,
+}]);
       }]);
 
       if (error) throw error;
