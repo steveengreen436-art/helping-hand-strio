@@ -4,7 +4,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 
 export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(false); // Toggle between Login/Signup
+  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -12,19 +12,28 @@ export default function AuthPage() {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage('Processing...');
-
     if (isLogin) {
-      // Log In Logic
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) setMessage('Error: ' + error.message);
       else router.push('/dashboard');
     } else {
-      // Sign Up Logic
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) setMessage('Error: ' + error.message);
-      else setMessage('Account created! You can now log in.');
+      else setMessage('Account created! Please log in.');
     }
+  };
+
+  // NEW: Password Recovery Function
+  const handleResetPassword = async () => {
+    if (!email) {
+      setMessage('Please enter your email above to reset password.');
+      return;
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/update-password`,
+    });
+    if (error) setMessage('Error: ' + error.message);
+    else setMessage('Check your email for the password reset link!');
   };
 
   return (
@@ -35,10 +44,18 @@ export default function AuthPage() {
         <input type="password" placeholder="Password" required className="p-3 bg-white text-black" onChange={(e) => setPassword(e.target.value)} />
         <button type="submit" className="bg-neonCyan text-black p-3 font-bold">{isLogin ? 'Log In' : 'Sign Up'}</button>
       </form>
-      <button onClick={() => setIsLogin(!isLogin)} className="mt-4 text-sm underline">
-        {isLogin ? "Need an account? Sign Up" : "Already have an account? Log In"}
-      </button>
-      <p className="mt-4 text-neonCyan">{message}</p>
+      
+      <div className="mt-4 flex flex-col items-center gap-2">
+        <button onClick={() => setIsLogin(!isLogin)} className="text-sm underline">
+          {isLogin ? "Need an account? Sign Up" : "Already have an account? Log In"}
+        </button>
+        {isLogin && (
+          <button onClick={handleResetPassword} className="text-xs text-neonCyan underline">
+            Forgot Password?
+          </button>
+        )}
+      </div>
+      <p className="mt-4 text-center px-4">{message}</p>
     </div>
   );
 }
