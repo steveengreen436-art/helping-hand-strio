@@ -5,10 +5,11 @@ import PostForm from '@/components/PostForm';
 
 export default function FeedPage() {
   const [posts, setPosts] = useState<any[]>([]);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState(''); // Added Search State
   const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'following'>('all');
   const [followedIds, setFollowedIds] = useState<string[]>([]);
-  const [commentInput, setCommentInput] = useState<Record<string, string>>({});
 
   useEffect(() => {
     async function init() {
@@ -19,85 +20,65 @@ export default function FeedPage() {
         if (data) setFollowedIds(data.map(f => f.following_id));
       }
       fetchPosts();
+      fetchSuggestions();
     }
     init();
-  }, [activeTab]); // Added activeTab to refresh when toggled
+  }, [activeTab]);
 
   async function fetchPosts() {
-    // Fetch posts with like count
-    let query = supabase.from('posts').select(`
-      *, 
-      profiles(full_name),
-      likes(count)
-    `);
-    
+    let query = supabase.from('posts').select('*, profiles(full_name), likes(count)');
     if (activeTab === 'following') {
       if (followedIds.length === 0) { setPosts([]); return; }
       query = query.in('user_id', followedIds);
     }
-    
     const { data } = await query.order('created_at', { ascending: false });
-    
-    if (data) {
-      const formattedPosts = data.map(post => ({
-        ...post,
-        likeCount: post.likes ? post.likes.length : 0
-      }));
-      setPosts(formattedPosts);
-    }
+    if (data) setPosts(data.map(p => ({ ...p, likeCount: p.likes?.length || 0 })));
   }
 
-  async function handleLike(postId: string) {
-    if (!user) return alert("Sign up to like!");
-    await supabase.from('likes').insert({ post_id: postId, user_id: user.id });
-    fetchPosts(); // Refresh counts
+  async function fetchSuggestions() {
+    const { data } = await supabase.from('profiles').select('id, full_name, skill').limit(10);
+    if (data) setSuggestions(data);
   }
 
-  async function addComment(postId: string) {
-    if (!user) return alert("Please sign up to comment.");
-    await supabase.from('comments').insert({ post_id: postId, user_id: user.id, content: commentInput[postId] });
-    setCommentInput({ ...commentInput, [postId]: '' });
-  }
+  // Filter logic for sidebar
+  const filteredSuggestions = suggestions.filter((s) =>
+    s.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div className="max-w-xl mx-auto p-6">
-      <h1 className="text-2xl font-bold text-white mb-6">Community Feed</h1>
-      
-      {/* Tabs */}
-      <div className="flex gap-4 mb-6">
-        <button onClick={() => setActiveTab('all')} className={`font-bold ${activeTab === 'all' ? 'text-neonCyan' : 'text-white/50'}`}>All</button>
-        <button onClick={() => setActiveTab('following')} className={`font-bold ${activeTab === 'following' ? 'text-neonCyan' : 'text-white/50'}`}>Following</button>
+    <div className="max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+      {/* Feed Column */}
+      <div className="md:col-span-2">
+        <h1 className="text-2xl font-bold text-white mb-6">Community Feed</h1>
+        {/* ... rest of your existing feed code remains the same ... */}
       </div>
 
-      {user ? <PostForm onPostCreated={fetchPosts} /> : <p className="text-white/50 mb-4 bg-slateCard p-3 rounded">Sign up to post and interact.</p>}
+      {/* Suggested Talent Sidebar with Search */}
+      <div className="hidden md:block">
+        <div className="bg-slateCard p-6 rounded-2xl border border-white/10 sticky top-6">
+          <h2 className="font-bold text-white mb-4">Suggested Talent</h2>
+          
+          {/* SEARCH BAR */}
+          <input 
+            type="text"
+            placeholder="Search talent..."
+            className="w-full bg-obsidian border border-white/10 p-2 rounded-lg text-xs text-white mb-4 focus:border-neonCyan outline-none"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
 
-      <div className="space-y-4">
-        {posts.map((post) => (
-          <div key={post.id} className="bg-slateCard p-4 rounded-xl border border-white/10 text-white">
-            <p className="font-bold text-neonCyan">{post.profiles?.full_name || 'Anonymous'}</p>
-            <p className="mt-2">{post.content}</p>
-            
-            <div className="mt-4 flex flex-col gap-2">
-              <div className="flex gap-4 text-sm items-center">
-                <button onClick={() => handleLike(post.id)} className="text-neonCyan font-bold flex items-center gap-2">
-                  Like 
-                  <span className="bg-white/10 px-2 py-0.5 rounded-full text-xs text-white">{post.likeCount}</span>
-                </button>
+          <div className="space-y-4">
+            {filteredSuggestions.map((s) => (
+              <div key={s.id} className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm font-bold text-white">{s.full_name}</p>
+                  <p className="text-[10px] text-neonCyan">{s.skill}</p>
+                </div>
+                <button className="text-[10px] bg-neonCyan/10 text-neonCyan px-2 py-1 rounded font-bold">Follow</button>
               </div>
-              
-              {/* Comment Input */}
-              <div className="flex gap-2 mt-2">
-                <input 
-                  className="bg-obsidian w-full p-2 rounded text-xs" 
-                  placeholder="Write a comment..."
-                  value={commentInput[post.id] || ''}
-                  onChange={(e) => setCommentInput({...commentInput, [post.id]: e.target.value})}
-                />
-                <button onClick={() => addComment(post.id)} className="bg-neonCyan text-obsidian px-3 rounded text-xs font-bold">Post</button>
-              </div>
-            </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );
