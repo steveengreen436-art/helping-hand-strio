@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import PostForm from '@/components/PostForm';
@@ -6,7 +7,7 @@ import PostForm from '@/components/PostForm';
 export default function FeedPage() {
   const [posts, setPosts] = useState<any[]>([]);
   const [suggestions, setSuggestions] = useState<any[]>([]);
-  const [searchQuery, setSearchQuery] = useState(''); // Added Search State
+  const [searchQuery, setSearchQuery] = useState('');
   const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'following'>('all');
   const [followedIds, setFollowedIds] = useState<string[]>([]);
@@ -40,7 +41,6 @@ export default function FeedPage() {
     if (data) setSuggestions(data);
   }
 
-  // Filter logic for sidebar
   const filteredSuggestions = suggestions.filter((s) =>
     s.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -50,7 +50,18 @@ export default function FeedPage() {
       {/* Feed Column */}
       <div className="md:col-span-2">
         <h1 className="text-2xl font-bold text-white mb-6">Community Feed</h1>
-        {/* ... rest of your existing feed code remains the same ... */}
+        
+        {posts.map((post) => (
+          <div key={post.id} className="bg-slateCard p-4 rounded-xl mb-4 border border-white/10">
+            <Link 
+              href={`/profile/${post.user_id}`} 
+              className="font-bold text-neonCyan hover:underline"
+            >
+              {post.profiles?.full_name || 'Anonymous'}
+            </Link>
+            <p className="text-white/80 mt-1">{post.content}</p>
+          </div>
+        ))}
       </div>
 
       {/* Suggested Talent Sidebar with Search */}
@@ -58,7 +69,6 @@ export default function FeedPage() {
         <div className="bg-slateCard p-6 rounded-2xl border border-white/10 sticky top-6">
           <h2 className="font-bold text-white mb-4">Suggested Talent</h2>
           
-          {/* SEARCH BAR */}
           <input 
             type="text"
             placeholder="Search talent..."
@@ -71,7 +81,9 @@ export default function FeedPage() {
             {filteredSuggestions.map((s) => (
               <div key={s.id} className="flex justify-between items-center">
                 <div>
-                  <p className="text-sm font-bold text-white">{s.full_name}</p>
+                  <Link href={`/profile/${s.id}`} className="text-sm font-bold text-white hover:text-neonCyan">
+                    {s.full_name}
+                  </Link>
                   <p className="text-[10px] text-neonCyan">{s.skill}</p>
                 </div>
                 <button className="text-[10px] bg-neonCyan/10 text-neonCyan px-2 py-1 rounded font-bold">Follow</button>
