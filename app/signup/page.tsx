@@ -1,52 +1,66 @@
-"use client";
+'use client'
+import { useState } from 'react'
+import { supabase } from '@/lib/supabaseClient'
 
-import { useState } from "react";
-import { supabase } from "@/lib/supabase";
-
-export default function SignUpPage() {
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+export default function SignUp() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
 
   const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
 
-    const { error } = await supabase.auth.signInWithOtp({
-      email: email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
-      },
-    });
-
-    if (error) {
-      alert("Error: " + error.message);
-    } else {
-      setSubmitted(true);
+    // 1. Request Location Permission
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
     }
-    setLoading(false);
-  };
+
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const locationString = `${position.coords.latitude},${position.coords.longitude}`
+
+      // 2. Sign Up User via Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      })
+
+      if (error) {
+        alert("Error signing up: " + error.message)
+        return
+      }
+
+      if (data.user) {
+        // 3. Save extra info to your new user_profiles table
+        const { error: profileError } = await supabase.from('user_profiles').insert([
+          { 
+            id: data.user.id, 
+            full_name: name, 
+            phone: phone, 
+            location: locationString 
+          }
+        ])
+
+        if (profileError) {
+          alert("Error saving profile: " + profileError.message)
+        } else {
+          alert('Account created successfully! Please check your email to verify.')
+        }
+      }
+    }, (err) => alert("Permission denied. We need your location to create an account."))
+  }
 
   return (
-    <div className="max-w-xl mx-auto py-12 px-4">
-      {submitted ? (
-        <div className="bg-slateCard p-8 rounded-2xl border border-white/10 text-center">
-          <h2 className="text-2xl text-platinum font-bold">Check your email!</h2>
-        </div>
-      ) : (
-        <form onSubmit={handleSignUp} className="bg-slateCard p-6 rounded-2xl border border-white/10 space-y-4">
-          <input 
-            type="email" 
-            placeholder="Enter your email" 
-            required 
-            className="w-full p-3 rounded-lg bg-obsidian text-platinum border border-white/10" 
-            onChange={(e) => setEmail(e.target.value)} 
-          />
-          <button type="submit" className="w-full py-3 bg-neonCyan text-obsidian font-bold rounded-lg">
-            {loading ? "Sending..." : "Send Magic Link"}
-          </button>
-        </form>
-      )}
+    <div style={{ padding: '20px', color: 'white' }}>
+      <h1>Create Account</h1>
+      <form onSubmit={handleSignUp} style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '300px' }}>
+        <input type="text" placeholder="Full Name" onChange={(e) => setName(e.target.value)} required />
+        <input type="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} required />
+        <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} required />
+        <input type="tel" placeholder="Phone Number" onChange={(e) => setPhone(e.target.value)} required />
+        <button type="submit">Sign Up & Agree to Share Location</button>
+      </form>
     </div>
-  );
+  )
 }
