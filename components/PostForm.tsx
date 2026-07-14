@@ -9,7 +9,6 @@ export default function PostForm({ onPostCreated }: { onPostCreated: () => void 
   async function handlePost() {
     if (!content.trim()) return;
     
-    // Check if user is logged in
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       alert("You must be logged in to post!");
@@ -24,7 +23,7 @@ export default function PostForm({ onPostCreated }: { onPostCreated: () => void 
 
     if (!error) {
       setContent('');
-      onPostCreated(); // Triggers the parent feed to refresh
+      onPostCreated();
     }
     setLoading(false);
   }
@@ -32,7 +31,7 @@ export default function PostForm({ onPostCreated }: { onPostCreated: () => void 
   return (
     <div className="bg-slateCard border border-white/10 p-4 rounded-xl mb-6">
       <textarea 
-        className="w-full bg-obsidian text-white p-3 rounded-lg border border-white/10 focus:border-neonCyan outline-none"
+        className="w-full bg-obsidian text-white p-3 rounded-lg border border-white/10 focus:border-neonCyan outline-none text-sm"
         placeholder="What's happening in your job/project?"
         value={content}
         onChange={(e) => setContent(e.target.value)}
@@ -40,9 +39,9 @@ export default function PostForm({ onPostCreated }: { onPostCreated: () => void 
       <button 
         onClick={handlePost} 
         disabled={loading}
-        className="mt-2 bg-neonCyan text-obsidian px-4 py-2 rounded-lg font-bold hover:opacity-90"
+        className="mt-2 bg-neonCyan text-obsidian px-4 py-2 rounded-lg font-bold hover:opacity-90 transition text-sm"
       >
-        {loading ? 'Posting...' : 'Post'}
+        {loading ? 'Publishing...' : 'Post Opportunity'}
       </button>
     </div>
   );
