@@ -21,20 +21,38 @@ export default function FeedPage() {
       fetchPosts();
     }
     init();
-  }, []);
+  }, [activeTab]); // Added activeTab to refresh when toggled
 
   async function fetchPosts() {
-    let query = supabase.from('posts').select('*, profiles(full_name)');
+    // Fetch posts with like count
+    let query = supabase.from('posts').select(`
+      *, 
+      profiles(full_name),
+      likes(count)
+    `);
     
     if (activeTab === 'following') {
+      if (followedIds.length === 0) { setPosts([]); return; }
       query = query.in('user_id', followedIds);
     }
     
     const { data } = await query.order('created_at', { ascending: false });
-    if (data) setPosts(data);
+    
+    if (data) {
+      const formattedPosts = data.map(post => ({
+        ...post,
+        likeCount: post.likes ? post.likes.length : 0
+      }));
+      setPosts(formattedPosts);
+    }
   }
 
-  // Interaction Handlers
+  async function handleLike(postId: string) {
+    if (!user) return alert("Sign up to like!");
+    await supabase.from('likes').insert({ post_id: postId, user_id: user.id });
+    fetchPosts(); // Refresh counts
+  }
+
   async function addComment(postId: string) {
     if (!user) return alert("Please sign up to comment.");
     await supabase.from('comments').insert({ post_id: postId, user_id: user.id, content: commentInput[postId] });
@@ -60,8 +78,11 @@ export default function FeedPage() {
             <p className="mt-2">{post.content}</p>
             
             <div className="mt-4 flex flex-col gap-2">
-              <div className="flex gap-4 text-sm">
-                <button onClick={() => user ? null : alert("Sign up to like!")} className="text-neonCyan">Like</button>
+              <div className="flex gap-4 text-sm items-center">
+                <button onClick={() => handleLike(post.id)} className="text-neonCyan font-bold flex items-center gap-2">
+                  Like 
+                  <span className="bg-white/10 px-2 py-0.5 rounded-full text-xs text-white">{post.likeCount}</span>
+                </button>
               </div>
               
               {/* Comment Input */}
