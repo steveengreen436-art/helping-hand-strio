@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../lib/supabaseClient';
-// 1. IMPORT YOUR COMPONENT
 import AnnouncementCard from '../components/AnnouncementCard';
 
 export default function HomePage() {
@@ -51,8 +50,8 @@ export default function HomePage() {
       {/* Feed Grid */}
       <section className="max-w-4xl mx-auto px-6 pb-20">
         
-        {/* 2. PLACE THE COMPONENT HERE */}
-        <AnnouncementCard />
+        {/* FIX: Added required props here */}
+        <AnnouncementCard location="Eswatini" email="helpinghandstrio@gmail.com" />
 
         <h2 className="text-2xl font-bold mb-8">Recent Activity</h2>
         
