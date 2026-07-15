@@ -8,7 +8,7 @@ export default function AuthPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState(''); // Restored
+  const [phone, setPhone] = useState(''); 
   const [message, setMessage] = useState('');
   const router = useRouter();
 
@@ -21,14 +21,14 @@ export default function AuthPage() {
     } else {
       const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) {
-        setMessage('Error: ' + error.message);
+        setMessage('Auth Error: ' + JSON.stringify(error));
       } else if (data.user) {
         navigator.geolocation.getCurrentPosition(async (position) => {
           const loc = `${position.coords.latitude}, ${position.coords.longitude}`;
           const { error: profileError } = await supabase.from('profiles').insert([
             { id: data.user!.id, full_name: fullName, phone: phone, location: loc }
           ]);
-          if (profileError) setMessage('Error saving profile: ' + profileError.message);
+          if (profileError) setMessage('Profile Error: ' + JSON.stringify(profileError));
           else setMessage('Account created! Please log in.');
         }, () => setMessage('Location access required for sign up.'));
       }
