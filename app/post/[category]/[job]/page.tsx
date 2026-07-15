@@ -1,31 +1,46 @@
 'use client'
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
-import { supabase } from '../../../../lib/supabaseClient'; // Adjust dots based on folder depth
+import { supabase } from '../../../../lib/supabaseClient';
 
 export default function JobPostPage() {
   const params = useParams();
-  // These variables automatically match the folder names from the URL
   const category = params.category as string;
   const job = params.job as string;
   
   const [content, setContent] = useState('');
 
   const handlePost = async () => {
-    // This saves the post with the category and job title attached
+    // 1. Get the current logged-in user
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert("You must be logged in to post.");
+      return;
+    }
+
+    // 2. Save the post including the user_id
     const { error } = await supabase.from('posts').insert([{ 
       content, 
       category: category, 
-      job_type: job 
+      job_type: job,
+      user_id: user.id // Linking the post to the user
     }]);
     
-    if (error) alert("Error posting: " + error.message);
-    else alert("Posted successfully!");
+    if (error) {
+      alert("Error posting: " + error.message);
+    } else {
+      alert("Posted successfully!");
+      // 3. Redirect back to the dashboard to see the feed
+      window.location.href = '/dashboard';
+    }
   };
 
   return (
     <div className="max-w-2xl mx-auto p-10 text-white min-h-screen">
-      <h1 className="text-3xl font-black mb-2 uppercase text-cyan-400">Post for: {job.replace(/-/g, ' ')}</h1>
+      <h1 className="text-3xl font-black mb-2 uppercase text-cyan-400">
+        Post for: {job.replace(/-/g, ' ')}
+      </h1>
       <p className="text-gray-400 mb-6 capitalize">Category: {category}</p>
       
       <textarea 
