@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import AnnouncementCard from '../../components/AnnouncementCard';
 
+// Full Category Data
 const jobData = [
   { title: "Healthcare & Medical Services", subs: ["Physicians", "Nursing", "Therapy-Rehab", "Pharmacy-Labs", "Emergency-Services", "Dental-Care"] },
   { title: "Technology, Software & Data", subs: ["Development", "Data-AI", "Infrastructure", "Cybersecurity", "Support", "Design"] },
@@ -25,11 +26,23 @@ export default function DashboardPage() {
 
   useEffect(() => {
     async function fetchPosts() {
-      const { data } = await supabase
+      // Fetching explicit fields to ensure smooth joins
+      const { data, error } = await supabase
         .from('posts')
-        .select(`id, content, category, job_type, user_profiles (full_name)`)
+        .select(`
+          id, 
+          content, 
+          category, 
+          job_type, 
+          user_profiles (full_name)
+        `)
         .order('created_at', { ascending: false });
-      if (data) setPosts(data);
+
+      if (error) {
+        console.error("Error fetching posts:", error.message);
+      } else {
+        setPosts(data || []);
+      }
       setLoading(false);
     }
     fetchPosts();
@@ -38,8 +51,11 @@ export default function DashboardPage() {
   return (
     <main className="min-h-screen bg-black text-white p-6">
       <section className="max-w-4xl mx-auto py-10">
+        
+        {/* Featured Announcement Card */}
         <AnnouncementCard location="Eswatini" email="helpinghandstrio@gmail.com" />
         
+        {/* Job Directory Section */}
         <h2 className="text-2xl font-bold mt-12 mb-6 text-cyan-400">Post a Job by Sector</h2>
         <div className="space-y-6 mb-12">
           {jobData.map((cat) => (
@@ -47,7 +63,11 @@ export default function DashboardPage() {
               <h3 className="text-md font-semibold text-gray-300 mb-2">{cat.title}</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 {cat.subs.map((job) => (
-                  <Link key={job} href={`/post/${cat.title.split(' ')[0].toLowerCase()}/${job.toLowerCase()}`} className="bg-gray-900 hover:bg-cyan-900 border border-gray-800 p-2 rounded text-xs text-center transition-all">
+                  <Link 
+                    key={job} 
+                    href={`/post/${cat.title.split(' ')[0].toLowerCase()}/${job.toLowerCase()}`} 
+                    className="bg-gray-900 hover:bg-cyan-900 border border-gray-800 p-2 rounded text-xs text-center transition-all"
+                  >
                     {job.replace(/-/g, ' ')}
                   </Link>
                 ))}
@@ -56,14 +76,23 @@ export default function DashboardPage() {
           ))}
         </div>
 
+        {/* Feed Section (Dynamic check integrated here!) */}
         <h2 className="text-2xl font-bold mb-8">Recent Activity</h2>
-        {loading ? <p>Loading...</p> : (
+        
+        {loading ? (
+          <p className="text-gray-500">Loading posts...</p>
+        ) : posts.length === 0 ? (
+          <p className="text-gray-500 italic">No activity yet. Be the first to post a job!</p>
+        ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {posts.map((post) => (
-              <div key={post.id} className="bg-gray-900 p-6 rounded-3xl border border-gray-800">
-                <p className="text-[10px] text-cyan-500 uppercase">{post.category} / {post.job_type.replace(/-/g, ' ')}</p>
-                <span className="font-bold">{post.user_profiles?.full_name || 'Anonymous'}</span>
-                <p className="text-gray-300 mt-2">{post.content}</p>
+              <div key={post.id} className="bg-gray-900 p-6 rounded-3xl border border-gray-800 hover:border-cyan-500 transition-all">
+                {/* Category and Job tags on top of each post */}
+                <p className="text-[10px] text-cyan-400 uppercase tracking-wider mb-2 font-bold">
+                  {post.category || 'General'} / {post.job_type ? post.job_type.replace(/-/g, ' ') : 'General'}
+                </p>
+                <span className="font-bold text-white">{post.user_profiles?.full_name || 'Anonymous'}</span>
+                <p className="text-gray-300 mt-2 text-sm leading-relaxed">{post.content}</p>
               </div>
             ))}
           </div>
