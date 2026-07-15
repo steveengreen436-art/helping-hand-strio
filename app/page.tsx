@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react';
+import Link from 'next/link'; // <--- Added this
 import { supabase } from '../lib/supabaseClient';
 
 export default function HomePage() {
@@ -8,7 +9,6 @@ export default function HomePage() {
 
   useEffect(() => {
     async function fetchPosts() {
-      // Fetch posts and link to user_profiles
       const { data, error } = await supabase
         .from('posts')
         .select(`*, user_profiles (full_name)`)
@@ -22,18 +22,33 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-black text-white p-6">
-      {/* Hero Header */}
-      <div className="flex flex-col items-center justify-center py-20">
-        <h1 className="text-6xl font-black text-white mb-6">Connecting Talent with <span className="text-cyan-400">Opportunity</span></h1>
+    <main className="min-h-screen bg-black text-white">
+      {/* Navigation Header */}
+      <nav className="flex justify-between items-center p-6 border-b border-gray-900">
+        <span className="font-bold text-xl">Helping Hand Strio</span>
         <div className="flex gap-4">
-          <button className="bg-cyan-400 text-black px-8 py-3 rounded-full font-bold">Create Account</button>
-          <button className="border border-gray-700 px-8 py-3 rounded-full">Browse Directory</button>
+          <Link href="/explore" className="text-sm font-bold">Browse Directory</Link>
+          <Link href="/post-cv" className="bg-cyan-400 text-black px-4 py-2 rounded-lg text-sm font-bold">Post CV</Link>
+        </div>
+      </nav>
+
+      {/* Hero Header */}
+      <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+        <h1 className="text-5xl md:text-7xl font-black text-white mb-6">
+          Connecting Talent with <br /> <span className="text-cyan-400">Opportunity</span>
+        </h1>
+        <div className="flex gap-4">
+          <Link href="/signup" className="bg-cyan-400 text-black px-8 py-3 rounded-full font-bold hover:bg-white transition-colors">
+            Create Account
+          </Link>
+          <Link href="/explore" className="border border-gray-700 px-8 py-3 rounded-full hover:border-gray-500 transition-colors">
+            Browse Directory
+          </Link>
         </div>
       </div>
 
       {/* Feed Grid */}
-      <section className="max-w-4xl mx-auto">
+      <section className="max-w-4xl mx-auto px-6 pb-20">
         <h2 className="text-2xl font-bold mb-8">Recent Activity</h2>
         
         {loading ? (
