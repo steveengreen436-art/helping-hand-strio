@@ -25,8 +25,9 @@ export default function AuthPage() {
       } else if (data.user) {
         navigator.geolocation.getCurrentPosition(async (position) => {
           const loc = `${position.coords.latitude}, ${position.coords.longitude}`;
+          // Fixed: updated full_name to first_name to match your database schema
           const { error: profileError } = await supabase.from('profiles').insert([
-            { id: data.user!.id, full_name: fullName, phone: phone, location: loc }
+            { id: data.user!.id, first_name: fullName, phone: phone, location: loc }
           ]);
           if (profileError) setMessage('Profile Error: ' + JSON.stringify(profileError));
           else setMessage('Account created! Please log in.');
